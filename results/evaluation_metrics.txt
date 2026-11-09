@@ -1,0 +1,23 @@
+TRAIN JOURNEY DURATION PREDICTION - MODEL EVALUATION
+=======================================================
+
+Linear Regression
+------------------------------
+MAE  : 1.1251 hours
+MSE  : 7.7913
+RMSE : 2.7913 hours
+R²   : 0.9382
+
+Multiple Linear Regression
+------------------------------
+MAE  : 0.9788 hours
+MSE  : 6.8980
+RMSE : 2.6264 hours
+R²   : 0.9453
+
+Best Model
+------------------------------
+Model: Multiple Linear Regression
+R²: 0.9453
+MAE: 0.9788 hours
+RMSE: 2.6264 hours

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1220">
+  <title>Rail ETA — Journey Intelligence</title>
+  <meta name="description" content="Rail ETA journey duration prediction and model intelligence dashboard.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#" aria-label="Rail ETA home">
+        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 5h16a3 3 0 0 1 3 3v13a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8a3 3 0 0 1 3-3Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 10h12M10 15h12M11 25l-3 4m13-4 3 4M10 21h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span><strong>rail<span>eta</span></strong><small>JOURNEY INTELLIGENCE</small></span>
+      </a>
+
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="nav-list" aria-label="Main navigation">
+        <button class="nav-item active" data-tab="predict"><span class="nav-icon">⌁</span><span>Predict journey</span><kbd>01</kbd></button>
+        <button class="nav-item" data-tab="models"><span class="nav-icon">▥</span><span>Model performance</span><kbd>02</kbd></button>
+        <button class="nav-item" data-tab="training"><span class="nav-icon">◈</span><span>Training centre</span><kbd>03</kbd></button>
+        <button class="nav-item" data-tab="insights"><span class="nav-icon">⌗</span><span>Data insights</span><kbd>04</kbd></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="model-status-card">
+          <div class="status-top"><span class="status-dot" id="modelStatusDot"></span><span>MODEL STATUS</span><span class="status-tag" id="modelStatusTag">CHECKING</span></div>
+          <strong id="modelStatusTitle">Checking model…</strong>
+          <p id="modelStatusText">Looking for your trained pipeline.</p>
+          <div class="status-divider"></div>
+          <div class="status-meta"><span>Pipeline</span><b id="modelFileName">rail_eta_best_model.joblib</b></div>
+        </div>
+        <div class="sidebar-foot"><span class="live-dot"></span> System interface <span class="version">v3.0.0</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+          <div class="breadcrumb">Workspace <span>/</span> <strong id="breadcrumbCurrent">Predict journey</strong></div>
+        </div>
+        <div class="topbar-right">
+          <div class="system-pill"><span class="live-dot"></span> All systems operational</div>
+          <button class="icon-button" id="refreshBtn" title="Refresh dashboard" aria-label="Refresh dashboard">↻</button>
+          <div class="avatar">RA</div>
+        </div>
+      </header>
+
+      <div class="page-wrap">
+        <section class="page-heading">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-line"></span> RAIL ANALYTICS PLATFORM</div>
+            <h1 id="pageTitle">Journey <span>prediction.</span></h1>
+            <p id="pageSubtitle">Estimate journey duration with your machine-learning ensemble.</p>
+          </div>
+          <div class="heading-date"><span class="date-icon">◷</span><span id="todayLabel">LIVE WORKSPACE</span></div>
+        </section>
+
+        <!-- PREDICT -->
+        <section class="tab-panel active" id="tab-predict">
+          <div class="hero-grid">
+            <article class="panel prediction-panel">
+              <div class="panel-heading">
+                <div><span class="panel-kicker">PREDICTION ENGINE</span><h2>Plan a journey</h2><p>Enter route details to calculate an estimated travel time.</p></div>
+                <span class="step-chip">STEP 01 <span>—</span> INPUT</span>
+              </div>
+              <form id="predictionForm">
+                <div class="form-grid">
+                  <label class="field field-wide">
+                    <span class="field-label">TOTAL ROUTE DISTANCE <span class="required">*</span></span>
+                    <span class="input-wrap"><input id="distance" name="distance" type="number" min="0.1" max="10000" step="0.1" value="500" required><span class="input-unit">KM</span></span>
+                    <small>Distance from the first departure to final arrival.</small>
+                  </label>
+                  <label class="field">
+                    <span class="field-label">NUMBER OF STATIONS <span class="required">*</span></span>
+                    <span class="input-wrap"><input id="stations" name="stations" type="number" min="1" max="500" step="1" value="10" required><span class="input-unit">STOPS</span></span>
+                    <small>Include intermediate stations.</small>
+                  </label>
+                  <div class="field">
+                    <span class="field-label">ROUTE PROFILE</span>
+                    <div class="profile-select"><span class="profile-icon">↗</span><span><b>Standard route</b><small>Based on available model features</small></span><span class="select-chevron">⌄</span></div>
+                    <small>Current model uses distance and station count.</small>
+                  </div>
+                </div>
+                <div class="form-footer">
+                  <div class="privacy-note"><span>✦</span> Prediction powered by your trained ML pipeline</div>
+                  <button class="primary-button" type="submit" id="predictBtn"><span>Generate prediction</span><span class="button-arrow">↗</span></button>
+                </div>
+              </form>
+            </article>
+
+            <aside class="panel insight-panel">
+              <div class="insight-orbit orbit-one"></div><div class="insight-orbit orbit-two"></div>
+              <div class="insight-content">
+                <span class="panel-kicker light-kicker">INTELLIGENCE AT A GLANCE</span>
+                <div class="insight-symbol">✳</div>
+                <h3>Smarter journey<br>estimates.</h3>
+                <p>A stacking ensemble combines multiple regression models to estimate end-to-end journey duration.</p>
+                <div class="insight-stats"><div><strong>09</strong><span>MODEL VARIANTS</span></div><div><strong>02</strong><span>INPUT FEATURES</span></div></div>
+              </div>
+              <div class="insight-bottom"><span>ENSEMBLE INTELLIGENCE</span><span class="pulse-line"></span></div>
+            </aside>
+          </div>
+
+          <section class="result-section" id="resultSection">
+            <div class="section-heading"><div><span class="panel-kicker">OUTPUT</span><h2>Prediction result</h2></div><span class="result-state" id="resultState">AWAITING INPUT</span></div>
+            <div class="result-grid">
+              <article class="panel result-main">
+                <div class="result-placeholder" id="resultPlaceholder">
+                  <div class="placeholder-icon">⌁</div><strong>Your journey estimate will appear here</strong><span>Enter the route distance and station count, then generate a prediction.</span>
+                </div>
+                <div class="result-value hidden" id="resultValue">
+                  <div class="result-label"><span class="success-check">✓</span> ESTIMATED JOURNEY DURATION</div>
+                  <div class="duration-number"><span id="durationHours">—</span><small>hours</small></div>
+                  <div class="duration-human" id="durationHuman">—</div>
+                  <div class="result-foot"><span>MODEL OUTPUT</span><b id="resultModel">Stacking ensemble</b></div>
+                </div>
+              </article>
+              <article class="panel result-details">
+                <span class="panel-kicker">ROUTE BREAKDOWN</span>
+                <div class="detail-row"><span>Route distance</span><strong id="resultDistance">—</strong></div>
+                <div class="detail-row"><span>Stations</span><strong id="resultStations">—</strong></div>
+                <div class="detail-row"><span>Average per 100 km</span><strong id="resultPace">—</strong></div>
+                <div class="detail-row"><span>Prediction status</span><strong class="text-success" id="predictionStatus">Not generated</strong></div>
+                <div class="detail-note">This estimate is generated from the currently loaded model and the supplied route features.</div>
+              </article>
+            </div>
+          </section>
+          <div class="how-grid">
+            <div class="how-copy"><span class="panel-kicker">THE PROCESS</span><h2>From route data<br>to reliable insight.</h2><p>The model learns relationships between route distance, station count and historical journey durations.</p></div>
+            <div class="how-step"><span>01</span><div><b>Define your route</b><p>Provide distance and the number of stations.</p></div></div>
+            <div class="how-step"><span>02</span><div><b>Ensemble inference</b><p>The trained pipeline processes your input features.</p></div></div>
+            <div class="how-step"><span>03</span><div><b>Review the estimate</b><p>Get a clear duration estimate and route breakdown.</p></div></div>
+          </div>
+        </section>
+
+        <!-- MODELS -->
+        <section class="tab-panel" id="tab-models">
+          <div class="section-heading"><div><span class="panel-kicker">MODEL INTELLIGENCE</span><h2>Performance overview</h2><p>Compare evaluation metrics from your latest training run.</p></div><span class="result-state">EVALUATION</span></div>
+          <div class="metric-grid">
+            <article class="panel metric-card"><span>BEST MODEL</span><strong class="metric-model" id="bestModelMetric">—</strong><small>Lowest RMSE</small><i>✳</i></article>
+            <article class="panel metric-card"><span>MAE <em>(HOURS)</em></span><strong id="maeMetric">—</strong><small>Mean absolute error</small><i>⌁</i></article>
+            <article class="panel metric-card"><span>RMSE <em>(HOURS)</em></span><strong id="rmseMetric">—</strong><small>Root mean squared error</small><i>⌖</i></article>
+            <article class="panel metric-card"><span>R² SCORE</span><strong id="r2Metric">—</strong><small>Coefficient of determination</small><i>↗</i></article>
+          </div>
+          <div class="chart-grid">
+            <article class="panel chart-panel"><div class="chart-title"><div><span class="panel-kicker">MODEL COMPARISON</span><h3>RMSE by model</h3></div><span class="chart-unit">LOWER IS BETTER</span></div><div class="chart-box"><canvas id="rmseChart"></canvas><div class="chart-empty" id="rmseEmpty">Training metrics will appear here after a model run.</div></div></article>
+            <article class="panel chart-panel"><div class="chart-title"><div><span class="panel-kicker">MODEL QUALITY</span><h3>Evaluation summary</h3></div><span class="chart-unit">LATEST RUN</span></div><div class="quality-list" id="qualityList"><div class="empty-line">No evaluation data loaded yet.</div></div></article>
+          </div>
+          <article class="panel table-panel"><div class="chart-title"><div><span class="panel-kicker">DETAILED RESULTS</span><h3>Model leaderboard</h3></div><span class="table-caption">SORTED BY RMSE</span></div><div class="table-scroll"><table><thead><tr><th>MODEL</th><th>MAE</th><th>RMSE</th><th>R² SCORE</th><th>RANK</th></tr></thead><tbody id="modelTableBody"><tr><td colspan="5" class="table-empty">No model metrics available. Run training to populate this table.</td></tr></tbody></table></div></article>
+        </section>
+
+        <!-- TRAINING -->
+        <section class="tab-panel" id="tab-training">
+          <div class="section-heading"><div><span class="panel-kicker">ML OPERATIONS</span><h2>Training centre</h2><p>Manage the model pipeline and inspect the model family.</p></div><span class="result-state">PIPELINE CONTROL</span></div>
+          <div class="training-grid">
+            <article class="panel training-panel"><div class="training-visual"><div class="training-ring">◈</div><span class="training-orbit"></span></div><span class="panel-kicker">MODEL PIPELINE</span><h3>Retrain your intelligence engine.</h3><p>Run the training pipeline to evaluate regressors, build the stacking ensemble and persist the best-performing model.</p><div class="training-meta"><div><span>ALGORITHM FAMILY</span><b>Regression ensemble</b></div><div><span>PIPELINE OUTPUT</span><b>Model + metrics</b></div></div><button class="primary-button full-button" id="trainBtn"><span>↻ &nbsp; Train / retrain model</span><span class="button-arrow">↗</span></button><div class="training-progress hidden" id="trainingProgress"><div class="progress-top"><span id="trainingMessage">Training pipeline…</span><b id="trainingPercent">RUNNING</b></div><div class="progress-track"><span></span></div></div><div class="training-feedback" id="trainingFeedback" aria-live="polite"></div></article>
+            <article class="panel model-zoo"><div class="chart-title"><div><span class="panel-kicker">THE MODEL ZOO</span><h3>Algorithms in the pipeline</h3></div><span class="chart-unit">09 MODELS</span></div><div class="model-list">
+              <div class="model-item"><span class="model-index">01</span><div><b>Linear Regression</b><small>Baseline linear model</small></div><span class="model-type">LINEAR</span></div>
+              <div class="model-item"><span class="model-index">02</span><div><b>Ridge</b><small>L2-regularised linear regression</small></div><span class="model-type">LINEAR</span></div>
+              <div class="model-item"><span class="model-index">03</span><div><b>Lasso</b><small>L1-regularised linear regression</small></div><span class="model-type">LINEAR</span></div>
+              <div class="model-item"><span class="model-index">04</span><div><b>ElasticNet</b><small>Combined L1 + L2 regularisation</small></div><span class="model-type">LINEAR</span></div>
+              <div class="model-item"><span class="model-index">05</span><div><b>Random Forest</b><small>Bagged decision trees</small></div><span class="model-type">ENSEMBLE</span></div>
+              <div class="model-item"><span class="model-index">06</span><div><b>Gradient Boosting</b><small>Sequential tree boosting</small></div><span class="model-type">BOOSTING</span></div>
+              <div class="model-item"><span class="model-index">07</span><div><b>HistGradientBoosting</b><small>Histogram-based boosting</small></div><span class="model-type">BOOSTING</span></div>
+              <div class="model-item"><span class="model-index">08</span><div><b>SVR</b><small>Support Vector Regression</small></div><span class="model-type">KERNEL</span></div>
+              <div class="model-item featured-model"><span class="model-index">09</span><div><b>Stacking Ensemble</b><small>RF + GB + Ridge → Linear meta-learner</small></div><span class="model-type">ENSEMBLE</span></div>
+            </div></article>
+          </div>
+        </section>
+
+        <!-- INSIGHTS -->
+        <section class="tab-panel" id="tab-insights">
+          <div class="section-heading"><div><span class="panel-kicker">DATA EXPLORATION</span><h2>Visual insights</h2><p>Explore the charts generated by your analytics pipeline.</p></div><span class="result-state">GENERATED ARTEFACTS</span></div>
+          <div class="visual-grid">
+            <article class="panel visual-card"><div class="visual-preview preview-blue"><div class="preview-axis"></div><div class="preview-line"></div><span>↗</span></div><div class="visual-info"><div><span class="panel-kicker">RELATIONSHIP</span><h3>Duration vs distance</h3><p>Journey duration against route distance.</p></div><span class="visual-number">01</span></div><div class="visual-image" id="visual-duration-distance"><span>Chart image will be loaded when available.</span></div></article>
+            <article class="panel visual-card"><div class="visual-preview preview-violet"><div class="preview-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div><span>⌗</span></div><div class="visual-info"><div><span class="panel-kicker">RELATIONSHIP</span><h3>Duration vs stations</h3><p>How stop count relates to journey time.</p></div><span class="visual-number">02</span></div><div class="visual-image" id="visual-duration-stations"><span>Chart image will be loaded when available.</span></div></article>
+            <article class="panel visual-card"><div class="visual-preview preview-green"><div class="preview-route"><i></i><i></i><i></i><i></i></div><span>⌁</span></div><div class="visual-info"><div><span class="panel-kicker">ROUTE RANKING</span><h3>Longest train routes</h3><p>Top routes ranked by journey length.</p></div><span class="visual-number">03</span></div><div class="visual-image" id="visual-top-routes"><span>Chart image will be loaded when available.</span></div></article>
+            <article class="panel visual-card"><div class="visual-preview preview-orange"><div class="scatter-dots">· · · · · · · · · · · ·</div><span>◎</span></div><div class="visual-info"><div><span class="panel-kicker">MODEL DIAGNOSTICS</span><h3>Actual vs predicted</h3><p>Compare model estimates with actual values.</p></div><span class="visual-number">04</span></div><div class="visual-image" id="visual-actual-predicted"><span>Chart image will be loaded when available.</span></div></article>
+            <article class="panel visual-card"><div class="visual-preview preview-pink"><div class="residual-bars"><i></i><i></i><i></i><i></i><i></i></div><span>⌖</span></div><div class="visual-info"><div><span class="panel-kicker">MODEL DIAGNOSTICS</span><h3>Residual analysis</h3><p>Inspect prediction errors and residual patterns.</p></div><span class="visual-number">05</span></div><div class="visual-image" id="visual-residuals"><span>Chart image will be loaded when available.</span></div></article>
+          </div>
+          <p class="insights-footnote">Visualisations are served from the figures directory configured by your Flask backend.</p>
+        </section>
+
+        <footer class="page-footer"><span>© 2026 RAIL ETA <i>·</i> JOURNEY DURATION INTELLIGENCE</span><span>BUILT FOR BETTER JOURNEYS <b>✳</b></span></footer>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
