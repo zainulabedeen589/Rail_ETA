@@ -176,8 +176,8 @@ Sysslan_Data_Science_Internship-main/
 Replace the placeholder with the repository URL you use.
 
 ```bash
-git clone https://github.com/<your-username>/Sysslan_Data_Science_Internship.git
-cd Sysslan_Data_Science_Internship-main
+git clone https://github.com/zainulabedeen589/Rail_ETA.git
+cd Rail_ETA-main
 ```
 
 ### 2. Create a virtual environment
